@@ -1,14 +1,11 @@
 package com.tyrone.calculator;
 
-import android.os.strictmode.CredentialProtectedWhileLockedViolation;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -24,9 +21,9 @@ public class MainActivity extends AppCompatActivity {
     }
     void setOperator(char c){
         char[] myChars = mainTextView.getText().toString().toCharArray();
-        if(myChars[myChars.length-1] != c && myChars.length > 0){
+        if(myChars[myChars.length - 1] != c){
             finalResult = false;
-            mainTextView.setText(mainTextView.getText()+Character.toString(c));
+            mainTextView.setText(String.format("%s%s", mainTextView.getText(), c));
         }
     }
     void insertNumber(char c){
@@ -34,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
             mainTextView.setText(Character.toString(c));
             finalResult = false;
         }else {
-            mainTextView.setText(mainTextView.getText() + Character.toString(c));
+            mainTextView.setText(String.format("%s%s", mainTextView.getText(), c));
         }
     }
     double compute(double n1 , double n2, String operator){
@@ -62,7 +59,11 @@ public class MainActivity extends AppCompatActivity {
         setOperator('+');
     }
     public void subButton(View view){
-        setOperator('-');
+        if(mainTextView.getText().toString().length() == 0){
+            mainTextView.setText(String.format("%s-", mainTextView.getText()));
+        }else {
+            setOperator('-');
+        }
     }
     public void multButton(View view){
         setOperator('x');
@@ -108,8 +109,8 @@ public class MainActivity extends AppCompatActivity {
         mainTextView.setText("0");
     }
     public void resultButton(View view){
-        List<String> strNumbers = Arrays.asList(mainTextView.getText().toString().split("[x+/-]"));
-        String[] ops = mainTextView.getText().toString().split("\\d+|[.]");
+        String[] strNumbers = mainTextView.getText().toString().split("(?<!^)[x+/-]");
+        String[] ops = mainTextView.getText().toString().split("\\d+|[.]|^-");
         List<String> strOperators = new ArrayList<>();
 
         boolean initialize = false;
@@ -119,13 +120,13 @@ public class MainActivity extends AppCompatActivity {
                     strOperators.add(s);
                 }
             }
-            Double holder = 0d;
-            for(int i = 0; i < strNumbers.size(); i++){
-                if(initialize == false){
-                    holder = Double.parseDouble(strNumbers.get(i));
+            double holder = 0d;
+            for (String strNumber : strNumbers) {
+                if (!initialize) {
+                    holder = Double.parseDouble(strNumber);
                     initialize = true;
-                }else if(strOperators.size() > 0){
-                    holder = compute(holder,Double.parseDouble(strNumbers.get(i)),strOperators.get(0));
+                } else if (strOperators.size() > 0) {
+                    holder = compute(holder, Double.parseDouble(strNumber), strOperators.get(0));
                     strOperators.remove(0);
                 }
             }
@@ -133,9 +134,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e){
             mainTextView.setText("Syntax Error");
         }
-
-        //Double result = compute(Double.parseDouble(strNumbers.get(0)),Double.parseDouble(strNumbers.get(1)),strOperators.get(0));
-        //mainTextView.setText(Double.toString(result));
 
         finalResult = true;
     }
