@@ -143,7 +143,7 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Large" android:singleLine="true"
                 app:layout_constraintHorizontal_bias="0.492" android:inputType="none"
                 android:clickable="false" android:cursorVisible="false"
-                android:editable="false" android:ellipsize="none" android:enabled="false"
-                app:autoSizeTextType="none"/>
+                android:ellipsize="none"
+                app:autoSizeTextType="none" android:autoText="true" android:enabled="false" android:editable="true"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

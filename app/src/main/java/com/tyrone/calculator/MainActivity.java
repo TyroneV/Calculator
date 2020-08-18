@@ -1,18 +1,23 @@
 package com.tyrone.calculator;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
     TextView mainTextView;
     boolean finalResult = true;
+    String mainAddress = "http://localhost:8080/test/Calculator2?input=";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,27 +38,6 @@ public class MainActivity extends AppCompatActivity {
         }else {
             mainTextView.setText(String.format("%s%s", mainTextView.getText(), c));
         }
-    }
-    double compute(double n1 , double n2, String operator){
-        double result = 0d;
-        switch (operator){
-            case "+":
-                result = n1 + n2;
-                break;
-            case "-":
-                result = n1 - n2;
-                break;
-            case "x":
-                result = n1 * n2;
-                break;
-            case "/":
-                result = n1 / n2;
-                break;
-            default:
-                return result;
-        }
-        return result;
-
     }
     public void addButton(View view){
         setOperator('+');
@@ -110,33 +94,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void resultButton(View view){
-        String[] strNumbers = mainTextView.getText().toString().split("(?<!^)[x+/-]");
-        String[] ops = mainTextView.getText().toString().split("\\d+|[.]|^-");
-        List<String> strOperators = new ArrayList<>();
 
-        boolean initialize = false;
+        String translate = mainTextView.getText().toString();
+        translate = translate.replaceAll("(?<!^)-","minus");
+        translate = translate.replaceAll("[+]","plus");
+        translate = translate.replaceAll("[x]","times");
+        translate = translate.replaceAll("[/]","div");
+        //mainTextView.setText(translate);
+        URL url = null;
         try {
-            for (String s: ops){
-                if(s.equals("x")||s.equals("/")||s.equals("-")||s.equals("+")){
-                    strOperators.add(s);
-                }
-            }
-            double holder = 0d;
-            for (String strNumber : strNumbers) {
-                if (!initialize) {
-                    holder = Double.parseDouble(strNumber);
-                    initialize = true;
-                } else if (strOperators.size() > 0) {
-                    holder = compute(holder, Double.parseDouble(strNumber), strOperators.get(0));
-                    strOperators.remove(0);
-                }
-            }
-            mainTextView.setText(Double.toString(holder));
-        } catch (Exception e){
-            mainTextView.setText("Syntax Error");
+            url = new URL(mainAddress+translate);
+//            url = new URL("http://webcode.me");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            //mainTextView.setText(e.toString());
         }
+        try{
+            BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+            String line;
+            StringBuilder sb = new StringBuilder();
 
-        finalResult = true;
+            while ((line = br.readLine()) != null) {
+
+                sb.append(line);
+                //sb.append(System.lineSeparator());
+            }
+            mainTextView.setText(sb.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            mainTextView.setText("Cannot Connect to server");
+        } catch (Exception e){
+            mainTextView.setText(e.toString());
+        }
     }
 
 }
