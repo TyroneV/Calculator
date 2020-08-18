@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
     public void clearButton(View view){
         mainTextView.setText("0");
     }
+
     public void resultButton(View view){
         String[] strNumbers = mainTextView.getText().toString().split("(?<!^)[x+/-]");
         String[] ops = mainTextView.getText().toString().split("\\d+|[.]|^-");
