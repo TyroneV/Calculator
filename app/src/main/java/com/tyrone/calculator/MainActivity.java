@@ -1,12 +1,9 @@
 package com.tyrone.calculator;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,15 +12,17 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView mainTextView;
+    public static TextView mainTextView;
     boolean finalResult = true;
-    String mainAddress = "http://localhost:8080/test/Calculator2?input=";
+    public static String myURL = "";
+    String mainAddress = "http://10.0.2.2:8080/test/Calculator?input=";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mainTextView = findViewById(R.id.resultText);
     }
+
     void setOperator(char c){
         char[] myChars = mainTextView.getText().toString().toCharArray();
         if(myChars[myChars.length - 1] != c){
@@ -100,31 +99,11 @@ public class MainActivity extends AppCompatActivity {
         translate = translate.replaceAll("[+]","plus");
         translate = translate.replaceAll("[x]","times");
         translate = translate.replaceAll("[/]","div");
-        //mainTextView.setText(translate);
-        URL url = null;
-        try {
-            url = new URL(mainAddress+translate);
-//            url = new URL("http://webcode.me");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            //mainTextView.setText(e.toString());
-        }
+        myURL = mainAddress + translate;
         try{
-            BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
-            String line;
-            StringBuilder sb = new StringBuilder();
-
-            while ((line = br.readLine()) != null) {
-
-                sb.append(line);
-                //sb.append(System.lineSeparator());
-            }
-            mainTextView.setText(sb.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-            mainTextView.setText("Cannot Connect to server");
+            new Reader().execute();
         } catch (Exception e){
-            mainTextView.setText(e.toString());
+            e.printStackTrace();
         }
     }
 
